@@ -48,13 +48,13 @@ function initCalendar() {
 
     date.innerHTML = months[month] + " " + year;
 
-    let days ="";
+    let days = "";
 
     for (let x = day; x > 0; x--) {
         days += `<div class="day prev-date">${prevDays - x + 1}</div>`;
       }
     
-    for(let i = 1; 1 <= lastDate; i++){
+    for(let i = 1; i < lastDate; i++){
         if (
             i === new Date().getDate() &&
             year === new Date().getFullYear() &&
