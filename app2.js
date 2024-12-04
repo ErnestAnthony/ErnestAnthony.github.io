@@ -67,6 +67,10 @@ function initCalendar() {
         }
     }
 
+    for(let j =1; j <= nextDays; j++){
+        days += `<div class="day next-date">${j}</div>`;
+    }
+
     daysContainer.innerHTML = days;
 }
 
