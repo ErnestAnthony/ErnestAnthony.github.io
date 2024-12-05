@@ -44,9 +44,6 @@
     font-size: 2rem;
 
 }
-.fa-gem{
-    margin-right: 0.5rem;
-}
 
 .navbar__menu{
     display: flex;
@@ -204,6 +201,7 @@
 }
 
 .main__container{
+    position: relative;
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: center;
