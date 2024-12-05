@@ -36,23 +36,27 @@ const months = [
     "November",
     "December",
 ];
-const eventsArr = [
-    {
-        day: 5,
-        month: 12,
-        year: 2024,
-        events:[
-            {
-                title: "Event 1",
-                time:"10:00AM"
-            },
-            {
-                title:"Event 2",
-                time:"11:00AM"
-            }
-        ]
-    }
-]
+// const eventsArr = [
+//     {
+//         day: 5,
+//         month: 12,
+//         year: 2024,
+//         events:[
+//             {
+//                 title: "Event 1",
+//                 time:"10:00AM"
+//             },
+//             {
+//                 title:"Event 2",
+//                 time:"11:00AM"
+//             }
+//         ]
+//     }
+// ]
+let eventsArr = [];
+
+getEvents();
+
 function initCalendar() {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -88,16 +92,19 @@ function initCalendar() {
           year === new Date().getFullYear() &&
           month === new Date().getMonth()
         ) {
+            activeDay = i;
+            getActiveDay(i);
+            updateEvents(i);
           if (event) {
-            days += `<div class="day today  event">${i}</div>`;
+            days += `<div class="day today active event">${i}</div>`;
           } else {
-            days += `<div class="day today ">${i}</div>`;
+            days += `<div class="day today active ">${i}</div>`;
           }
         } else {
           if (event) {
             days += `<div class="day event">${i}</div>`;
           } else {
-            days += `<div class="day ">${i}</div>`;
+            days += `<div class="day">${i}</div>`;
           }
         }
       }
@@ -108,7 +115,7 @@ function initCalendar() {
 
     daysContainer.innerHTML = days;
 
-    addListener();
+    addListner();
 }
 
 initCalendar();
@@ -122,14 +129,14 @@ function prevMonth(){
     initCalendar();
 }
 
-function nextMonth(){
+function nextMonth() {
     month++;
-    if(month > 11){
-        month = 0;
-        year++;
+    if (month > 11) {
+      month = 0;
+      year++;
     }
     initCalendar();
-}
+  }
 
 prev.addEventListener("click", prevMonth);
 next.addEventListener("click", nextMonth);
@@ -154,7 +161,7 @@ dateInput.addEventListener("input", (e) => {
         dateInput.value = dateInput.value.slice(0, 2);
       }
     }
-  });
+});
 
 gotoBtn.addEventListener("click", gotoDate);
 
@@ -170,11 +177,11 @@ function gotoDate() {
       }
     }
     alert("Invalid Date");
-  }
+}
 
-  addEventBtn.addEventListener("click", () =>{
+addEventBtn.addEventListener("click", () =>{
     addEventWrapper.classList.toggle("active");
-  });
+});
 
   addEventCloseBtn.addEventListener("click", () =>{
     addEventWrapper.classList.remove("active");
@@ -210,32 +217,220 @@ function gotoDate() {
     }
   });
 
-  function addListener(){
+function addListner() {
+
     const days = document.querySelectorAll(".day");
-    days.forEach((day) =>{
-        day.addEventListener("click", (e) =>{
-            activeDay = Number(e.target.innerHTML)
+    
 
-            days.forEach((day)=>{
-                day.classList.remove("active");
+    days.forEach((day) => {
+        day.addEventListener("click", (e) => {
+            activeDay = Number(e.target.innerHTML);
+            getActiveDay(e.target.innerHTML);
+            updateEvents(Number(e.target.innerHTML));
+            
+            days.forEach((day) => {
+              day.classList.remove("active");
             });
-
-
-            if(e.target.classList.contains("prev-date")){
-                prevMonth();
+            
+            if (e.target.classList.contains("prev-date")) {
+              prevMonth();
+              
+              setTimeout(() => {
+                
+                const days = document.querySelectorAll(".day");
+                days.forEach((day) => {
+                  if (
+                    !day.classList.contains("prev-date") &&
+                    day.innerHTML === e.target.innerHTML
+                  ) {
+                    day.classList.add("active");
+                  }
+                });
+              }, 100);
+            } 
+            else if(e.target.classList.contains("next-date")){
+                nextMonth();
 
                 setTimeout(()=>{
                     const days = document.querySelectorAll(".day");
+
                     days.forEach((day)=>{
                         if(
-                            !day.classList.contains("prev-date") &&
-                            day.innerHTML === e.target.innerHTML
+                            !day.classList.contains("next-date") && day.innerHTML===e.target.innerHTML
                         ){
                             day.classList.add("active");
                         }
                     });
                 }, 100);
+                
+            }
+            else{
+                e.target.classList.add("active");
             }
         });
     });
-  }
+}
+
+
+function getActiveDay(date){
+    const day = new Date(year, month, date);
+    const dayName = day.toString().split(" ")[0];
+    eventDay.innerHTML = dayName;
+    eventDate.innerHTML = date + " " + months[month] + " " + year;
+}
+
+function updateEvents(date) {
+    let events = "";
+    eventsArr.forEach((event) => {
+      if (
+        date === event.day &&
+        month + 1 === event.month &&
+        year === event.year
+      ) {
+        event.events.forEach((event) => {
+          events += `<div class="event">
+              <div class="title">
+                <i class="fas fa-circle"></i>
+                <h3 class="event-title">${event.title}</h3>
+              </div>
+              <div class="event-time">
+                <span class="event-time">${event.time}</span>
+              </div>
+          </div>`;
+        });
+      }
+    });
+    if ((events === "")) {
+      events = `<div class="no-event">
+              <h3>No Appointments</h3>
+          </div>`;
+    }
+    eventsContainer.innerHTML = events; 
+    saveEvents();
+}
+
+addEventSubmit.addEventListener("click", () =>{
+    const EventTitle = addEventTitle.value;
+    const eventTimeFrom = addEventFrom.value;
+    const eventTimeTo = addEventTo.value;
+
+    if(
+        EventTitle === "" ||
+        eventTimeFrom === "" ||
+        eventTimeTo === ""
+    ){
+        alert("Please fill all the fields");
+        return;
+    }
+    const timeFromArr = eventTimeFrom.split(":");
+    const timeToArr = eventTimeTo.split(":");
+
+    if(timeFromArr.length !== 2 ||
+    timeToArr.length !== 2 ||
+    timeFromArr[0] > 23 ||
+    timeFromArr[1] > 59 ||
+    timeToArr[0] > 23 ||
+    timeToArr[1] > 59 
+    ){
+        alert("Invalid Time Format");
+    }
+
+    const timeFrom = convertTime(eventTimeFrom);
+    const timeTo = convertTime(eventTimeTo);
+
+    const newEvent = {
+        title: EventTitle,
+        time: timeFrom + " - " + timeTo
+    };
+
+    let eventAdded = false;
+
+    if(eventsArr.length > 0){
+        eventsArr.forEach((item)=>{
+            if(
+                item.day === activeDay &&
+                item.month === month +1 &&
+                item.year === year
+            ){
+                item .events.push(newEvent);
+                eventAdded=true;
+            }
+        })
+    }
+
+    if(!eventAdded){
+        eventsArr.push({
+            day:activeDay,
+            month: month + 1,
+            year: year,
+            events: [newEvent]
+        });
+    }
+
+
+    addEventWrapper.classList.remove("active");
+    addEventTitle.value = "";
+    addEventFrom.value = "";
+    addEventTo.value = "";
+
+    updateEvents(activeDay);
+
+    const activeDayElem = document.querySelector(".day.active");
+    if(!activeDayElem.classList.contains("event")){
+        activeDayElem.classList.add("event");
+    }
+});
+
+function convertTime(time){
+    let timeArr = time.split(":");
+    let timeHour = timeArr[0];
+    let timeMin = timeArr[1];
+    let timeFormat = timeHour >= 12 ? "PM" : "AM";
+    timeHour = timeHour % 12 || 12;
+    time = timeHour + ":" + timeMin + " " + timeFormat;
+    return time;
+}
+
+eventsContainer.addEventListener("click", (e) => {
+    if (e.target.classList.contains("event")) {
+      if (confirm("Are you sure you want to delete this event?")) {
+        const eventTitle = e.target.children[0].children[1].innerHTML;
+        eventsArr.forEach((event) => {
+          if (
+            event.day === activeDay &&
+            event.month === month + 1 &&
+            event.year === year
+          ) {
+            event.events.forEach((item, index) => {
+              if (item.title === eventTitle) {
+                event.events.splice(index, 1);
+              }
+            });
+            //if no events left in a day then remove that day from eventsArr
+            if (event.events.length === 0) {
+              eventsArr.splice(eventsArr.indexOf(event), 1);
+              //remove event class from day
+              const activeDayEl = document.querySelector(".day.active");
+              if (activeDayEl.classList.contains("event")) {
+                activeDayEl.classList.remove("event");
+              }
+            }
+          }
+        });
+        updateEvents(activeDay);
+      }
+    }
+  });
+
+function saveEvents(){
+    localStorage.setItem("events", JSON.stringify(eventsArr));
+}
+
+function getEvents(){
+    if(localStorage.getItem("event" === null)){
+        return;
+    }
+    eventsArr.push(...JSON.parse(localStorage.getItem("events")));
+}
+
+
