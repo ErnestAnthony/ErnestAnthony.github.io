@@ -9,12 +9,16 @@ menu.addEventListener('click', function(){
 
 const modal = document.getElementById('email-modal');
 const openBtn = document.querySelector('.main__btn');
+const openBtn2 = document.querySelector('.navbar__btn');
 const closeBtn = document.querySelector('.close-btn');
 
 openBtn.addEventListener('click', () =>{
     modal.style.display = 'block';
 });
 
+openBtn2.addEventListener('click', () =>{
+    modal.style.display = 'block';
+});
 closeBtn.addEventListener('click', () =>{
     modal.style.display = 'none';
 });
