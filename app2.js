@@ -36,26 +36,11 @@ const months = [
     "November",
     "December",
 ];
-// const eventsArr = [
-//     {
-//         day: 5,
-//         month: 12,
-//         year: 2024,
-//         events:[
-//             {
-//                 title: "Event 1",
-//                 time:"10:00AM"
-//             },
-//             {
-//                 title:"Event 2",
-//                 time:"11:00AM"
-//             }
-//         ]
-//     }
-// ]
+
 let eventsArr = [];
 
 getEvents();
+console.log(eventsArr);
 
 function initCalendar() {
     const firstDay = new Date(year, month, 1);
